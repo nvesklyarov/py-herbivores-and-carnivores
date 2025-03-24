@@ -1,26 +1,37 @@
+from __future__ import annotations
+
+
 class Animal:
-    alive: list["Animal"] = []
+    alive = []
 
     def __init__(self, name: str, health: int = 100) -> None:
-        self.name: str = name
-        self.health: int = health
-        self.hidden: bool = False
+        self.name = name
+        self.health = health
+        self.hidden = False
         Animal.alive.append(self)
 
-    def __repr__(self) -> str:
-        return (
-            f"{{Name: {self.name}, "
-            f"Health: {self.health}, "
-            f"Hidden: {self.hidden}}}"
-        )
+    def death(self) -> None:
+        if self in Animal.alive:
+            Animal.alive.remove(self)
 
-    @classmethod
-    def remove_dead(cls) -> None:
-        cls.alive = [animal for animal in cls.alive if animal.health > 0]
+    @property
+    def health(self) -> Animal:
+        return self._health
 
-    @classmethod
-    def __str__(cls) -> str:
-        return str(cls.alive)
+    @health.setter
+    def health(self, value: int) -> None:
+        if value <= 0:
+            self._health = 0
+            self.death()
+        else:
+            self._health = value
+
+    def __repr__(self) -> None:
+        return (f"{{"
+                f"Name: {self.name}, "
+                f"Health: {self.health}, "
+                f"Hidden: {self.hidden}"
+                f"}}")
 
 
 class Herbivore(Animal):
@@ -29,7 +40,6 @@ class Herbivore(Animal):
 
 
 class Carnivore(Animal):
-    def bite(self, herbivore: "Herbivore") -> None:
+    def bite(self, herbivore: Herbivore) -> None:
         if isinstance(herbivore, Herbivore) and not herbivore.hidden:
             herbivore.health -= 50
-            Animal.remove_dead()
